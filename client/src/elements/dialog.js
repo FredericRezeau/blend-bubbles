@@ -253,7 +253,7 @@ export class DialogElement extends LitElement {
             }
 
             .dialog {
-                background: rgba(0, 0, 0, 1);
+                background: rgba(0, 0, 0, 0.85);
                 display: flex;
                 flex-direction: column;
                 height: calc(100dvh - 100px);
