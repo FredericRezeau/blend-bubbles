@@ -1,0 +1,20 @@
+{
+  "name": "blend-bubbles",
+  "version": "1.0.0",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "start": "concurrently --raw -n server,client -c green,cyan \"npm --workspace server run start\" \"npm --workspace client run dev\"",
+    "build": "npm run build --prefix client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.2.0",
+    "nodemon": "^3.1.10"
+  }
+}
