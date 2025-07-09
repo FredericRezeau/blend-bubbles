@@ -4,13 +4,13 @@
 
 ![Blend Bubbles UI](./preview.gif)
 
+Running live at [blendbubbles.xyz](https://blendbubbles.xyz).
+
 Inspired by BanterBubbles, **Blend Bubbles** is a visualization tool for [Blend](https://www.blend.capital) lending markets. It offers an interactive UI to explore changes in supply, borrow, and APY metrics across all Blend pool assets.
 
 The project includes a standalone server that periodically snapshots Blend market data from the [Stellar](https://stellar.org/) ledger. It supports both delta and time-series queries, with caching and overlay for always-fresh data. The backend is self-contained, using SQLite for storage—no external setup or dependencies required.
 
 The frontend is lightweight, fast and mobile-friendly (with PWA installation support)—built with [Vite](https://vitejs.dev), [Lit](https://lit.dev) and raw HTML5 canvas rendering. The *Asset Details* view also includes time-series charts.
-
-Running live at [blendbubbles.xyz](https://blendbubbles.xyz).
 
 [Blend](https://www.blend.capital) is a universal liquidity protocol primitive built on [Stellar](https://stellar.org/) that enables permissionless lending pool creation.
 
