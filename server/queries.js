@@ -45,7 +45,6 @@ const getDeltas = (fields, minutes) => {
         return `
           WITH all_snapshots AS (
             SELECT timestamp, json FROM snapshots
-            WHERE id = -1 OR id != -1
           ),
           snapshot_bounds AS (
             SELECT MAX(timestamp) AS end_ts, MAX(timestamp) - (${minutes} * 60) AS start_ts FROM all_snapshots
@@ -148,7 +147,6 @@ const getSeries = (fields, minutes) => {
     const query = `
       WITH all_snapshots AS (
         SELECT timestamp, json FROM snapshots
-        WHERE id = -1 OR id != -1
       ),
       snapshot_bounds AS (
         SELECT MAX(timestamp) AS end_ts, MAX(timestamp) - (${minutes} * 60) AS start_ts FROM all_snapshots

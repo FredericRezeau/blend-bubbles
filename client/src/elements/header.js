@@ -32,7 +32,7 @@ export class Header extends LitElement {
             const buttons = this.renderRoot?.querySelectorAll(`.${group}-group .tab`);
             const highlight = this.renderRoot?.querySelector(`.${group}-group .highlight`);
             if (buttons?.length && highlight) {
-                const selected = [...buttons].find(btn => btn.textContent.trim() === this[group]);
+                const selected = [...buttons].find(btn => btn.textContent.replace(/[\sΔ]/g, '') === this[group]);
                 if (selected) {
                     const { offsetLeft, offsetWidth } = selected;
                     highlight.style.transform = `translateX(${offsetLeft}px)`;
@@ -82,7 +82,7 @@ export class Header extends LitElement {
                 <button
                   class="tab label-${metric.toLowerCase()} ${this.metric === metric ? 'active' : ''}"
                   @click="${() => this.handleClick('metric', metric)}"
-                >${metric}</button>
+                >Δ ${metric}</button>
               `)}
             </div>
             <div class="group time-group">
