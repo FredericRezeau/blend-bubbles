@@ -19,7 +19,7 @@ export class Header extends LitElement {
         super();
         this.mode = 'SUPPLY';
         this.metric = 'FLOW';
-        this.time = 'LIVE';
+        this.time = '1D';
     }
 
     handleClick(type, value) {

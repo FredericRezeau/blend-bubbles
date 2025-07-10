@@ -221,10 +221,11 @@ export class Utils {
 
     static timeToMinutes(time) {
         switch (time) {
+            case 'LIVE': return 720;
             case '1D': return 1440;
             case '1W': return 10080;
             case '1M': return 43800;
-            default: return 720;
+            default: return 1440;
         }
     }
 }

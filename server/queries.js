@@ -43,8 +43,12 @@ const getDeltas = (fields, minutes) => {
         ]).join(',\n');
 
         return `
-          WITH snapshot_bounds AS (
-            SELECT MAX(timestamp) AS end_ts, MAX(timestamp) - (${minutes} * 60) AS start_ts FROM snapshots
+          WITH all_snapshots AS (
+            SELECT timestamp, json FROM snapshots
+            WHERE id = -1 OR id != -1
+          ),
+          snapshot_bounds AS (
+            SELECT MAX(timestamp) AS end_ts, MAX(timestamp) - (${minutes} * 60) AS start_ts FROM all_snapshots
           ),
           exploded AS (
             SELECT 
@@ -58,7 +62,7 @@ const getDeltas = (fields, minutes) => {
               json_extract(a.value, '$.meta.asset.code') AS asset_code,
               json_extract(a.value, '$.meta.asset.issuer') AS asset_issuer,
               ${extracts}
-            FROM snapshots s
+            FROM all_snapshots s
             JOIN json_each(s.json) AS p
             JOIN json_each(json_extract(p.value, '$.assets')) AS a
             WHERE s.timestamp BETWEEN (SELECT start_ts FROM snapshot_bounds) AND (SELECT end_ts FROM snapshot_bounds)
@@ -142,8 +146,12 @@ const getSeries = (fields, minutes) => {
         `json_extract(a.value, '${FIELDS[f]}') AS ${f}`
     ).join(',\n');
     const query = `
-      WITH snapshot_bounds AS (
-        SELECT MAX(timestamp) AS end_ts, MAX(timestamp) - (${minutes} * 60) AS start_ts FROM snapshots
+      WITH all_snapshots AS (
+        SELECT timestamp, json FROM snapshots
+        WHERE id = -1 OR id != -1
+      ),
+      snapshot_bounds AS (
+        SELECT MAX(timestamp) AS end_ts, MAX(timestamp) - (${minutes} * 60) AS start_ts FROM all_snapshots
       ),
       exploded AS (
         SELECT 
@@ -156,7 +164,7 @@ const getSeries = (fields, minutes) => {
           json_extract(a.value, '$.meta.asset.code') AS asset_code,
           json_extract(a.value, '$.meta.asset.issuer') AS asset_issuer,
           ${extracts}
-        FROM snapshots s
+        FROM all_snapshots s
         JOIN json_each(s.json) AS p
         JOIN json_each(json_extract(p.value, '$.assets')) AS a
         WHERE s.timestamp BETWEEN (SELECT start_ts FROM snapshot_bounds) AND (SELECT end_ts FROM snapshot_bounds)
