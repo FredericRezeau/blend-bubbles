@@ -94,6 +94,12 @@ export class Camera {
     }
 }
 
+export const MetricsType = {
+    DELTA_TOTAL: 'DELTA_TOTAL',
+    DELTA_APY: 'DELTA_APY',
+    APY: 'APY'
+};
+
 export class Utils {
     static #cssVars = {};
     static #unitCamera = new Camera();
@@ -156,6 +162,24 @@ export class Utils {
         return number?.toLocaleString('en-US',
             { minimumFractionDigits: digits, maximumFractionDigits: digits }) || '';
     }
+
+    static formatLabel = (value, metric) => {
+        if (!metric || metric === MetricsType.DELTA_TOTAL || metric === MetricsType.DELTA_APY) {
+            const pct = value * 100;
+            if (value === 0) {
+                return '–';
+            } else if (Math.abs(pct) < 0.01) {
+                return value > 0 ? '<0.01%' : '<-0.01%';
+            } else {
+                return `${value > 0 ? '+' : ''}${pct.toFixed(2)}%`;
+            }
+        } else if (metric === MetricsType.APY) {
+            if (value === 0) return '0.00%';
+            const pct = value * 100;
+            if (Math.abs(pct) < 0.01) return value > 0 ? '<0.01%' : '<-0.01%';
+            return `${pct.toFixed(2)}%`;
+        }
+    };
 
     static deflateRect(rect, x, y) {
         return {
@@ -237,3 +261,4 @@ export const StellarLogo = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0
 
 Object.freeze(Camera);
 Object.freeze(Utils);
+Object.freeze(MetricsType);

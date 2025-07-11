@@ -7,7 +7,7 @@
  */
 
 import { System } from './system.js';
-import { Utils, StellarLogo } from './utils.js';
+import { Utils, StellarLogo, MetricsType } from './utils.js';
 import { Horizon, StellarToml } from 'stellar-sdk';
 
 const horizon = new Horizon.Server(import.meta.env.VITE_HORIZON_ENDPOINT || 'https://horizon.stellar.org', { allowHttp: true });
@@ -182,19 +182,29 @@ export class Scene {
 
         let maxValue = 0;
         for (const b of bubbles) {
-            if (!this.#metric || this.#metric === 'FLOW') {
+            if (!this.#metric || this.#metric === MetricsType.DELTA_TOTAL) {
                 if (isSupply()) {
                     b.value = (b.data?.delta?.supply || 0) / (b.data?.start?.supply || 0.0001);
                 } else {
                     b.value = (b.data?.delta?.borrow || 0) / (b.data?.start?.borrow || 0.0001);
                 }
-            } else if (this.#metric === 'APY') {
+                b.sign = Math.sign(b.value) === 1;
+            } else if (this.#metric === MetricsType.DELTA_APY) {
                 if (isSupply()) {
                     b.value = b.data?.delta?.supplyApy || 0;
                 } else {
                     b.value = b.data?.delta?.borrowApy || 0;
                 }
+                b.sign = Math.sign(b.value) === 1;
+            } else if (this.#metric === MetricsType.APY) {
+                b.value = isSupply() ? b.data?.end?.supplyApy : b.data?.end?.borrowApy;
+                if (isSupply()) {
+                    b.sign = Math.sign(b.data?.delta?.supplyApy || 0) === 1;
+                } else {
+                    b.sign = Math.sign(b.data?.delta?.supplyApy || 0) === 1;
+                }
             }
+            b.displayLabel = Utils.formatLabel(b.value, this.#metric);
             maxValue = Math.max(maxValue, Math.abs(b.value));
         }
 
@@ -208,14 +218,6 @@ export class Scene {
                 b.vy = (Math.random() * 2 - 1) * 5;
                 b.scale = 1;
                 b.poolColor = this.#poolColorMap[b.data.poolId];
-            }
-            const pct = b.value * 100;
-            if (b.value === 0) {
-                b.displayLabel = '–';
-            } else if (Math.abs(pct) < 0.01) {
-                b.displayLabel = b.value > 0 ? '<0.01%' : '<-0.01%';
-            } else {
-                b.displayLabel = `${b.value > 0 ? '+' : ''}${pct.toFixed(2)}%`;
             }
             b.scale = (0.3 + 0.7 * Math.pow((maxValue > 0 ? Math.abs(b.value) / maxValue : 0), 0.25)) * 1.3;
             total += b.scale;
@@ -345,7 +347,7 @@ export class Scene {
         };
 
         this.#bubbles.forEach(b => {
-            drawBubble(b.x, b.y, b.radius - b.border, b.border / System.scaleUnit * 0.4, (b.value || 0) >= 0, b.hover);
+            drawBubble(b.x, b.y, b.radius - b.border, b.border / System.scaleUnit * 0.4, b.sign, b.hover);
 
             context.save();
             context.translate(0, b.radius * 0.24);
@@ -430,7 +432,7 @@ export class Scene {
         dialog.bubble = bubble;
         dialog.title = title;
         dialog.mode = this.#mode || 'SUPPLY';
-        dialog.metric = this.#metric || 'FLOW';
+        dialog.metric = this.#metric || MetricsType.DELTA_TOTAL;
         dialog.isVisible = true;
     }
 

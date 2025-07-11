@@ -7,7 +7,7 @@
  */
 
 import { LitElement, css, html } from 'lit';
-import { Utils } from '../utils';
+import { Utils, MetricsType } from '../utils';
 import { Chart, LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Filler } from 'chart.js';
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Filler);
@@ -28,7 +28,7 @@ export class DialogElement extends LitElement {
         this.bubble = '';
         this.title = '';
         this.mode = 'SUPPLY';
-        this.metric = 'FLOW';
+        this.metric = MetricsType.DELTA_TOTAL;
         this.isVisible = false;
         this._handleKeyDown = this._handleKeyDown.bind(this);
     }
@@ -51,7 +51,7 @@ export class DialogElement extends LitElement {
         }
 
         const { mode, metric } = this;
-        const key = (mode === 'SUPPLY' ? 'supply' : 'borrow') + (metric === 'APY' ? 'Apy' : '');
+        const key = (mode === 'SUPPLY' ? 'supply' : 'borrow') + (metric === MetricsType.DELTA_APY || metric === MetricsType.APY ? 'Apy' : '');
         const raw = this.bubble.series[key];
         if (!raw || raw.length === 0) {
             return;
@@ -66,8 +66,16 @@ export class DialogElement extends LitElement {
                 month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
             })
         );
-        const values = raw.map(p => metric === 'FLOW' ? (p.value / 1e7) : (p.value * 100));
-        const label = `${mode.charAt(0)}${mode.slice(1).toLowerCase()} ${metric === 'APY' ? 'APY (%)' : 'Volume'}`;
+        const values = raw.map(p => metric === MetricsType.DELTA_TOTAL ? (p.value / 1e7) : (p.value * 100));
+        const label = (() => {
+            switch (metric) {
+                case MetricsType.DELTA_APY:
+                case MetricsType.APY:
+                    return `${mode.charAt(0)}${mode.slice(1).toLowerCase()} APY`;
+                case MetricsType.DELTA_TOTAL:
+                    return `Total ${mode === 'SUPPLY' ? 'Supplied' : 'Borrowed'}`;
+            }
+        })();
         const title = this.shadowRoot.getElementById('chart-title');
         if (title) {
             title.textContent = label;
@@ -97,7 +105,7 @@ export class DialogElement extends LitElement {
                         callbacks: {
                             label: (ctx) => {
                                 const val = ctx.raw;
-                                return metric === 'APY'
+                                return metric === MetricsType.DELTA_APY || metric === MetricsType.APY
                                     ? `${val.toFixed(4)}%`
                                     : Utils.formatNumber(val);
                             }
@@ -112,7 +120,7 @@ export class DialogElement extends LitElement {
                     y: {
                         ticks: {
                             color: '#aaa',
-                            callback: val => metric === 'APY' ? `${val.toFixed(2)}%` : val.toLocaleString()
+                            callback: val => metric === MetricsType.DELTA_APY || metric === MetricsType.APY ? `${val.toFixed(2)}%` : Utils.formatNumber(val, true)
                         },
                         grid: { color: 'rgba(255,255,255,0.05)' }
                     }
