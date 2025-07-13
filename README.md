@@ -19,8 +19,9 @@ The frontend is lightweight, fast and mobile-friendly (with PWA installation sup
 ## 📊 Metrics and Timeframes
 
 📈 **Metrics**
-- **FLOW**: Bubble size reflects the magnitude of change in supply or borrow volume.
-- **APY**: Bubble size reflects the magnitude of change in estimated supply or borrow APY.
+- **TOTAL SUPPLIED/BORROWED Δ (%)**: Bubble size reflects the magnitude of change in supply or borrow volume.
+- **SUPPLY/BORROW APY Δ (%)**: Bubble size reflects the magnitude of change in estimated supply or borrow APY.
+- **SUPPLY/BORROW APY**: Bubble size reflects the current estimated supply or borrow APY.
 
 ⏱ **Timeframes**
 - **LIVE**: Tracks changes from the latest snapshot (default: 1 min) up to 12 hours of intraday data.
