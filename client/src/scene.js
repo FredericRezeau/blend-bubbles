@@ -183,11 +183,9 @@ export class Scene {
         let maxValue = 0;
         for (const b of bubbles) {
             if (!this.#metric || this.#metric === MetricsType.DELTA_TOTAL) {
-                if (isSupply()) {
-                    b.value = (b.data?.delta?.supply || 0) / (b.data?.start?.supply || 0.0001);
-                } else {
-                    b.value = (b.data?.delta?.borrow || 0) / (b.data?.start?.borrow || 0.0001);
-                }
+                const start = isSupply() ? b.data?.start?.supply : b.data?.start?.borrow;
+                const delta = isSupply() ? b.data?.delta?.supply : b.data?.delta?.borrow;
+                b.value = start ? delta / start : 0;
                 b.sign = Math.sign(b.value) === 1;
             } else if (this.#metric === MetricsType.DELTA_APY) {
                 if (isSupply()) {
